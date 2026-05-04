@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Curso Express de Constelação Familiar — João Antônio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&family=Raleway:wght@800&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================
+       DESIGN TOKENS — O Ponto Cego Design System
+       ============================================ */
+    :root {
+      --color-bg:          #000C14;
+      --color-bg-alt:      #010D15;
+      --color-surface:     #13191D;
+      --color-cream:       #FDF8ED;
+      --color-gold:        #F0CB6D;
+      --color-gold-hover:  #DBB658;
+      --color-gold-glow:   rgba(215, 143, 20, 0.48);
+      --color-text:        #FFFFFF;
+      --color-text-muted:  #69727D;
+      --color-border:      #E3E9ED;
+      --color-border-cream:#E3DDD8;
+      --color-error:       #E42929;
+      --color-success:     #13AD7F;
+
+      --font-display: 'Raleway', sans-serif;
+      --font-body:    'Montserrat', sans-serif;
+
+      --sp-xs:  7px;
+      --sp-sm:  11px;
+      --sp-md:  16px;
+      --sp-lg:  24px;
+      --sp-xl:  36px;
+      --sp-2xl: 54px;
+      --sp-3xl: 81px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      font-family: var(--font-body);
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ---- Layout ---- */
+    .wrap       { max-width: 1200px; margin: 0 auto; padding: 0 var(--sp-lg); }
+    .wrap--md   { max-width: 800px;  margin: 0 auto; padding: 0 var(--sp-lg); }
+    .wrap--sm   { max-width: 640px;  margin: 0 auto; padding: 0 var(--sp-lg); }
+
+    /* ---- Sections ---- */
+    .sec        { padding: var(--sp-3xl) 0; }
+    .sec--dark  { background-color: var(--color-bg); }
+    .sec--alt   { background-color: var(--color-bg-alt); }
+    .sec--cream { background-color: var(--color-cream); }
+
+    /* ---- Typography ---- */
+    .t-label {
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      color: var(--color-gold);
+    }
+    .t-hero {
+      font-family: var(--font-display);
+      font-size: clamp(38px, 7vw, 72px);
+      font-weight: 800; line-height: 1.1; letter-spacing: -0.03em;
+    }
+    .t-h2 {
+      font-size: clamp(26px, 4vw, 40px);
+      font-weight: 700; line-height: 1.2; letter-spacing: -0.01em;
+    }
+    .t-h3 {
+      font-size: clamp(20px, 3vw, 28px);
+      font-weight: 700; line-height: 1.3;
+    }
+    .t-body-lg { font-size: 19px; line-height: 1.75; }
+    .t-body     { font-size: 16px; line-height: 1.65; }
+    .t-small    { font-size: 14px; line-height: 1.6; }
+    .t-gold     { color: var(--color-gold); }
+    .t-muted    { color: var(--color-text-muted); }
+    .t-dark     { color: var(--color-bg); }
+    .t-center   { text-align: center; }
+
+    /* ---- Buttons ---- */
+    .btn {
+      display: block; width: 100%;
+      font-family: var(--font-body); font-size: 17px; font-weight: 700;
+      line-height: 1.2; text-align: center; text-decoration: none;
+      cursor: pointer; border: none; border-radius: 0;
+      transition: background-color 0.3s;
+    }
+    .btn--gold {
+      background-color: var(--color-gold);
+      color: var(--color-bg);
+      padding: 20px 0 18px;
+    }
+    .btn--gold:hover { background-color: var(--color-gold-hover); }
+
+    .btn-cap {
+      font-size: 13px; color: var(--color-text-muted);
+      text-align: center; margin-top: 12px;
+    }
+    .btn-wrap { max-width: 560px; margin: 0 auto; }
+
+    /* ---- Narrative prose ---- */
+    .prose p {
+      font-size: 18px; line-height: 1.8;
+      color: var(--color-text); margin-bottom: var(--sp-lg);
+    }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose strong { color: var(--color-gold); font-weight: 700; }
+
+    .callout {
+      font-size: 20px; font-weight: 700; line-height: 1.5;
+      border-left: 3px solid var(--color-gold);
+      padding-left: var(--sp-lg);
+      margin: var(--sp-xl) 0;
+      color: var(--color-text);
+    }
+
+    /* ---- Problem bullets ---- */
+    .problem-list { list-style: none; max-width: 640px; margin: var(--sp-xl) auto; }
+    .problem-list li {
+      font-size: 18px; line-height: 1.6;
+      padding: var(--sp-md) 0;
+      border-bottom: 1px solid rgba(227,233,237,0.08);
+      display: flex; gap: var(--sp-md); align-items: flex-start;
+    }
+    .problem-list li::before {
+      content: "—"; color: var(--color-gold);
+      font-weight: 700; flex-shrink: 0; margin-top: 2px;
+    }
+
+    /* ---- Deliverables ---- */
+    .deliverables { display: flex; flex-direction: column; gap: 2px; margin-top: var(--sp-xl); }
+    .dlv {
+      background-color: var(--color-surface);
+      padding: var(--sp-lg) var(--sp-xl);
+      display: flex; gap: var(--sp-lg); align-items: flex-start;
+    }
+    .dlv__icon  { color: var(--color-gold); font-size: 18px; flex-shrink: 0; margin-top: 3px; }
+    .dlv__title { font-weight: 700; font-size: 16px; display: block; margin-bottom: 3px; }
+    .dlv__desc  { font-size: 14px; color: var(--color-text-muted); }
+
+    /* ---- Testimonials ---- */
+    .tgrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: var(--sp-lg); margin-top: var(--sp-2xl);
+    }
+    .tcard {
+      background-color: var(--color-cream);
+      border: 1px solid var(--color-border-cream);
+      padding: var(--sp-xl);
+    }
+    .tcard__placeholder {
+      font-size: 14px; color: #888; font-style: italic;
+      background: rgba(0,0,0,0.04); border: 2px dashed #ccc;
+      padding: var(--sp-lg); margin-bottom: var(--sp-lg); border-radius: 3px;
+    }
+    .tcard__name { font-size: 14px; font-weight: 700; color: var(--color-bg); display: block; }
+    .tcard__city { font-size: 13px; color: #69727D; }
+
+    /* ---- Bio numbers ---- */
+    .creds {
+      display: flex; gap: var(--sp-2xl);
+      justify-content: center; flex-wrap: wrap;
+      margin: var(--sp-2xl) 0;
+    }
+    .cred { text-align: center; }
+    .cred__num {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 6vw, 52px);
+      font-weight: 800; color: var(--color-gold);
+      line-height: 1; display: block;
+    }
+    .cred__lbl { font-size: 14px; color: var(--color-text-muted); display: block; margin-top: 4px; }
+
+    /* ---- Pricing ---- */
+    .pricing { text-align: center; max-width: 560px; margin: 0 auto; }
+    .pricing__original {
+      font-size: 20px; font-weight: 400;
+      color: var(--color-text-muted); text-decoration: line-through;
+      margin-bottom: var(--sp-sm);
+    }
+    .pricing__price {
+      font-family: var(--font-display);
+      font-size: clamp(60px, 12vw, 88px);
+      font-weight: 800; color: var(--color-text);
+      line-height: 1; margin-bottom: var(--sp-sm);
+    }
+    .pricing__price sup {
+      font-family: var(--font-body); font-size: 32px; font-weight: 700;
+      vertical-align: super; line-height: 0;
+    }
+    .pricing__note {
+      font-size: 14px; font-weight: 700;
+      color: var(--color-gold); margin-bottom: var(--sp-2xl);
+    }
+
+    .guarantee {
+      display: flex; gap: var(--sp-lg); align-items: center;
+      border: 1px solid rgba(240,203,109,0.2);
+      padding: var(--sp-lg) var(--sp-xl);
+      margin-top: var(--sp-xl);
+    }
+    .guarantee__icon { font-size: 34px; flex-shrink: 0; }
+    .guarantee__title { font-size: 14px; font-weight: 700; color: var(--color-gold); display: block; }
+    .guarantee__desc  { font-size: 13px; color: var(--color-text-muted); }
+
+    /* ---- Urgency placeholder ---- */
+    .urgency-box {
+      border: 1px solid rgba(240,203,109,0.2);
+      background: rgba(240,203,109,0.04);
+      padding: var(--sp-xl); text-align: center;
+      max-width: 640px; margin: 0 auto;
+    }
+    .urgency-box p { font-size: 14px; color: var(--color-text-muted); margin-top: 8px; }
+
+    /* ---- P.S. block ---- */
+    .ps-block {
+      max-width: 640px; margin: 0 auto;
+      border-top: 1px solid rgba(227,233,237,0.12);
+      padding-top: var(--sp-2xl);
+    }
+    .ps-block p {
+      font-size: 18px; line-height: 1.8;
+      color: var(--color-text-muted); margin-bottom: var(--sp-lg);
+    }
+    .ps-block p:last-child { margin-bottom: 0; }
+    .ps-label { color: var(--color-gold); font-weight: 700; }
+
+    /* ---- Utils ---- */
+    .mt-sm  { margin-top: var(--sp-sm); }
+    .mt-md  { margin-top: var(--sp-md); }
+    .mt-lg  { margin-top: var(--sp-lg); }
+    .mt-xl  { margin-top: var(--sp-xl); }
+    .mt-2xl { margin-top: var(--sp-2xl); }
+    .mb-lg  { margin-bottom: var(--sp-lg); }
+    .mb-xl  { margin-bottom: var(--sp-xl); }
+    .mb-2xl { margin-bottom: var(--sp-2xl); }
+
+    /* ---- Responsive ---- */
+    @media (max-width: 767px) {
+      .sec { padding: var(--sp-2xl) 0; }
+      .problem-list li  { font-size: 16px; }
+      .prose p          { font-size: 16px; }
+      .callout          { font-size: 18px; }
+      .tgrid            { grid-template-columns: 1fr; }
+      .guarantee        { flex-direction: column; text-align: center; }
+      .dlv              { padding: var(--sp-lg); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ================================================
+     HERO
+     ================================================ -->
+<section class="sec sec--dark">
+  <div class="wrap--sm">
+    <p class="t-label t-center mb-lg">Constelação Familiar · Curso Express</p>
+
+    <h1 class="t-hero t-center mb-xl">
+      Para você que já fez tudo certo na vida — e ainda sente que está travada no mesmo lugar
+    </h1>
+
+    <p class="t-body-lg t-muted t-center mb-2xl" style="max-width:620px; margin-left:auto; margin-right:auto;">
+      Depois de 30 anos como advogado, eu vi centenas de famílias destruindo umas às outras repetindo os mesmos padrões. Quando descobri o porquê, mudei de carreira. Agora preciso te contar o que aprendi.
+    </p>
+
+    <div class="btn-wrap">
+      <a href="#oferta" class="btn btn--gold">
+        QUERO ENTENDER DE ONDE VÊM OS MEUS PADRÕES — R$19,00
+      </a>
+      <p class="btn-cap">Acesso imediato · Garantia de 7 dias · Pagamento 100% seguro</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ================================================
+     OPENING HOOK
+     ================================================ -->
+<section class="sec sec--alt">
+  <div class="wrap--md">
+    <div class="prose">
+      <p>Eu não deveria ser constelador.</p>
+
+      <p>Durante <strong>30 anos, fui advogado</strong>. Sentei do outro lado da mesa de famílias inteiras brigando por herança, por guarda de filhos, por dívidas que ninguém sabia de onde vieram.</p>
+
+      <p>E com o tempo, percebi uma coisa que me perturbou profundamente:</p>
+
+      <p class="callout">As mesmas histórias se repetiam. Família diferente. Personagens diferentes. Mas o roteiro era idêntico.</p>
+
+      <p>O filho que repetia os erros do pai. A filha que se casava com o mesmo tipo de homem, divorciava, e casava de novo. A empresária bem-sucedida que chegava perto do sucesso — e sabotava tudo, toda vez, sem conseguir explicar por quê.</p>
+
+      <p>Eu achava que era coincidência.</p>
+
+      <p><strong>Até conhecer a Constelação Familiar.</strong></p>
+
+      <p>Aí percebi: não era coincidência. Era <strong>herança invisível</strong>. E eu tinha passado três décadas vendo os sintomas sem jamais entender a causa.</p>
+
+      <p>Saí do direito. Treinei por anos no Brasil e na Alemanha com os maiores mestres do método. Constelei por mais de 16 anos. E hoje, o que eu faço não é só ensinar constelação.</p>
+
+      <p>É mostrar para mulheres como você <strong>de onde vêm os padrões que você tenta quebrar há tanto tempo.</strong></p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ================================================
+     AGITAÇÃO DO PROBLEMA
+     ================================================ -->
+<section class="sec sec--dark">
+  <div class="wrap--md">
+    <p class="t-label t-center mb-lg">O que você está sentindo</p>
+    <h2 class="t-h2 t-center mb-xl">Você chegou até aqui porque conhece uma sensação específica</h2>
+
+    <div class="prose" style="text-align:center; max-width:640px; margin: 0 auto;">
+      <p>Não é desespero. É algo mais silencioso. Mais frustrante.</p>
+      <p>É aquela sensação de que você está fazendo tudo certo — e mesmo assim, os resultados são os mesmos de sempre.</p>
+      <p style="color:var(--color-text-muted);">Você foi à terapia. Leu os livros. Fez os cursos. Tentou se conhecer.</p>
+      <p style="font-weight:700; color:var(--color-text);">E ainda assim:</p>
+    </div>
+
+    <ul class="problem-list">
+      <li>O dinheiro chega e escapa. Sem motivo claro.</li>
+      <li>Você atrai relacionamentos que parecem diferentes no início. E terminam igual.</li>
+      <li>Você se pega fazendo as mesmas escolhas que prometeu nunca fazer.</li>
+      <li>Tem dias em que o cansaço que você sente não é físico. É mais fundo. Como se carregasse algo que não é só seu.</li>
+    </ul>
+
+    <div class="prose mt-xl">
+      <p class="callout">Sabe por que isso acontece?<br>Porque parte do que você vive não começou em você.</p>
+
+      <p>Não é fraqueza. Não é falta de esforço. Não é karma.</p>
+
+      <p>É que você está vivendo dentro de um sistema que foi construído antes de você nascer. E enquanto você não enxergar esse sistema, vai continuar lutando contra uma corrente que não sabe que existe.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ================================================
+     SOLUÇÃO
+     ================================================ -->
+<section class="sec sec--alt">
+  <div class="wrap--md">
+    <p class="t-label t-center mb-lg">A solução</p>
+    <h2 class="t-h2 t-center mb-xl">O que a Constelação Familiar revela</h2>
+
+    <div class="prose">
+      <p>A Constelação Familiar foi desenvolvida por <strong>Bert Hellinger</strong>, um dos maiores estudiosos do comportamento humano do século XX. Em mais de 50 anos de pesquisa, ele descobriu algo que a psicologia convencional levou décadas para reconhecer:</p>
+
+      <p class="callout">Padrões emocionais, financeiros e relacionais se transmitem de geração em geração como herança invisível.</p>
+
+      <p>Não é metáfora. <strong>É mecanismo real.</strong></p>
+
+      <p>E quando você entende esse mecanismo, algo muda.</p>
+
+      <p>Não de forma mágica. De forma estrutural.</p>
+
+      <p>Você começa a ver suas reações com olhos novos. A entender por que certas situações te afetam mais do que deveriam. A identificar de onde vieram alguns dos seus medos mais profundos.</p>
+
+      <p>E com isso, você ganha o que nenhuma terapia de sintoma consegue te dar:</p>
+
+      <p class="callout">A capacidade de tomar decisões de verdade. A partir de quem você é. Não de quem sua família foi.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ================================================
+     O QUE VOCÊ RECEBE
+     ================================================ -->
+<section class="sec sec--dark">
+  <div class="wrap--md">
+    <p class="t-label t-center mb-lg">O que está incluído</p>
+    <h2 class="t-h2 t-center">Curso Express de Constelação Familiar</h2>
+    <p class="t-body t-muted t-center mt-sm mb-xl">Acesso imediato após o pagamento</p>
+
+    <div class="deliverables">
+      <div class="dlv">
+        <span class="dlv__icon">✦</span>
+        <div>
+          <span class="dlv__title">Aulas gravadas completas</span>
+          <span class="dlv__desc">Assista no seu ritmo, quantas vezes quiser. Sem prazo para terminar.</span>
+        </div>
+      </div>
+      <div class="dlv">
+        <span class="dlv__icon">✦</span>
+        <div>
+          <span class="dlv__title">Introdução ao método</span>
+          <span class="dlv__desc">O que é, como funciona e por que é diferente de qualquer coisa que você já viu.</span>
+        </div>
+      </div>
+      <div class="dlv">
+        <span class="dlv__icon">✦</span>
+        <div>
+          <span class="dlv__title">Mapeamento de padrões</span>
+          <span class="dlv__desc">Como identificar os ciclos que se repetem na SUA história específica.</span>
+        </div>
+      </div>
+      <div class="dlv">
+        <span class="dlv__icon">✦</span>
+        <div>
+          <span class="dlv__title">Práticas de respiração e meditação</span>
+          <span class="dlv__desc">Para trabalhar o que as aulas revelam no corpo, não só na mente.</span>
+        </div>
+      </div>
+      <div class="dlv">
+        <span class="dlv__icon">✦</span>
+        <div>
+          <span class="dlv__title">Acesso vitalício</span>
+          <span class="dlv__desc">O conteúdo fica com você. Reveja quando precisar.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ================================================
+     PROVA SOCIAL — CREAM
+     ================================================ -->
+<section class="sec sec--cream">
+  <div class="wrap">
+    <p class="t-label t-center mb-lg" style="color:var(--color-bg);">Resultados reais</p>
+    <h2 class="t-h2 t-center t-dark mb-sm">O que acontece quando você vê o padrão</h2>
+    <p class="t-body t-center mb-xl" style="color:#54595F;">Depoimentos de mulheres que passaram pelo método</p>
+
+    <div class="tgrid">
+      <div class="tcard">
+        <div class="tcard__placeholder">
+          ⚠️ <strong>[DEPOIMENTO 1]</strong><br><br>
+          Transformação em relacionamentos.<br>
+          Ex: "Depois de 3 casamentos que terminaram igual, finalmente entendi o padrão. Não casei de novo — me casei diferente."
+        </div>
+        <span class="tcard__name">[Nome completo]</span>
+        <span class="tcard__city">[Cidade]</span>
+      </div>
+
+      <div class="tcard">
+        <div class="tcard__placeholder">
+          ⚠️ <strong>[DEPOIMENTO 2]</strong><br><br>
+          Transformação financeira ou profissional.<br>
+          Números reais quando possível.
+        </div>
+        <span class="tcard__name">[Nome completo]</span>
+        <span class="tcard__city">[Cidade]</span>
+      </div>
+
+      <div class="tcard">
+        <div class="tcard__placeholder">
+          ⚠️ <strong>[DEPOIMENTO 3]</strong><br><br>
+          Mulher 30+ que tentou outras abordagens antes<br>e encontrou resposta aqui.
+        </div>
+        <span class="tcard__name">[Nome completo]</span>
+        <span class="tcard__city">[Cidade]</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ================================================
+     QUEM É JOÃO ANTÔNIO
+     ================================================ -->
+<section class="sec sec--alt">
+  <div class="wrap--md">
+    <p class="t-label t-center mb-lg">Quem vai te guiar</p>
+    <h2 class="t-h2 t-center mb-sm">João Antônio</h2>
+    <p class="t-body t-gold t-center mb-2xl">Advogado · Constelador Familiar · 16 anos de prática</p>
+
+    <div class="creds">
+      <div class="cred">
+        <span class="cred__num">30</span>
+        <span class="cred__lbl">anos como advogado</span>
+      </div>
+      <div class="cred">
+        <span class="cred__num">16</span>
+        <span class="cred__lbl">anos constelando</span>
+      </div>
+      <div class="cred">
+        <span class="cred__num" style="font-size:44px;">🇩🇪</span>
+        <span class="cred__lbl">treinado na Alemanha</span>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>Eu não sou um terapeuta que sempre quis ajudar pessoas.</p>
+
+      <p>Sou um advogado que passou 30 anos dentro do tribunal e dentro das famílias brasileiras mais variadas — das mais simples às mais complexas — e que um dia percebeu que estava tratando os sintomas de algo que nenhum processo judicial conseguia resolver.</p>
+
+      <p>Fui para a Alemanha. Estudei com mestres reconhecidos do método de Bert Hellinger. Voltei. Estudei mais. Constelei por 16 anos.</p>
+
+      <p>E hoje, a combinação entre 30 anos observando padrões reais em famílias reais e 16 anos de prática em constelação me coloca em um lugar que poucos terapeutas ou consteladores ocupam:</p>
+
+      <p class="callout">Eu não só conheço o método. Eu vi — ao vivo, com consequências jurídicas e emocionais reais — o que acontece quando esses padrões não são tratados.<br><br>E o que acontece quando são.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ================================================
+     OFERTA + PREÇO
+     ================================================ -->
+<section id="oferta" class="sec sec--dark">
+  <div class="wrap--md">
+    <p class="t-label t-center mb-lg">A oferta</p>
+    <h2 class="t-h2 t-center mb-xl">Tudo que você acabou de ver</h2>
+
+    <ul class="problem-list" style="max-width:100%;">
+      <li>As aulas gravadas completas</li>
+      <li>O mapeamento dos seus padrões específicos</li>
+      <li>As práticas de respiração e meditação</li>
+      <li>O acesso vitalício</li>
+      <li>30 anos de observação clínica de padrões familiares</li>
+      <li>16 anos de prática em constelação</li>
+    </ul>
+
+    <div class="pricing mt-2xl">
+      <p class="pricing__original">De R$197,00</p>
+      <p class="pricing__price"><sup>R$</sup>19</p>
+      <p class="pricing__note">Não é erro de digitação.</p>
+
+      <a href="#" class="btn btn--gold" style="font-size:18px; padding: 22px 0 20px;">
+        QUERO ENTENDER DE ONDE VÊM OS MEUS PADRÕES — R$19,00
+      </a>
+      <p class="btn-cap mt-md">Acesso imediato · Pagamento 100% seguro</p>
+
+      <div class="guarantee">
+        <span class="guarantee__icon">🛡️</span>
+        <div>
+          <span class="guarantee__title">Garantia incondicional de 7 dias</span>
+          <span class="guarantee__desc">Se não valer cada centavo, é só mandar um email. Devolvemos tudo. Sem perguntas. Sem burocracia.</span>
+        </div>
+      </div>
+
+      <p class="t-body t-muted mt-xl" style="line-height:1.7;">
+        Eu cobro R$19 porque acredito que o preço não pode ser o motivo pelo qual você vai continuar carregando o que não é seu.
+      </p>
+
+      <p class="t-gold mt-lg" style="font-weight:700; font-size:18px;">
+        O risco é meu. O resultado é seu.
+      </p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ================================================
+     URGÊNCIA — PLACEHOLDER
+     ================================================ -->
+<section class="sec sec--alt">
+  <div class="wrap--sm">
+    <div class="urgency-box">
+      <p style="color:var(--color-text); font-weight:700;">⚠️ [ADICIONAR ELEMENTO DE URGÊNCIA REAL AQUI]</p>
+      <p>Ex: vagas limitadas para Q&A ao vivo, bônus por tempo limitado, preço promocional com data de encerramento.</p>
+      <p style="margin-top:8px; color:var(--color-error);">Urgência falsa destrói confiança — use só se for real.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ================================================
+     CTA SECUNDÁRIO
+     ================================================ -->
+<section class="sec sec--dark">
+  <div class="wrap--sm" style="text-align:center;">
+    <div class="btn-wrap">
+      <a href="#" class="btn btn--gold" style="font-size:18px; padding: 22px 0 20px;">
+        GARANTIR MEU ACESSO AGORA POR R$19
+      </a>
+      <p class="btn-cap mt-md">7 dias de garantia total. Se não valer, devolvemos tudo.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ================================================
+     P.S.
+     ================================================ -->
+<section class="sec sec--alt">
+  <div class="wrap--sm">
+    <div class="ps-block">
+      <p><span class="ps-label">P.S.</span> Se você chegou até aqui lendo, você já sabe que isso é pra você.</p>
+
+      <p>A pergunta não é se vale R$19. A pergunta é: há quanto tempo você carrega padrões que não são seus — e por quanto tempo mais vai carregar?</p>
+
+      <p>Eu passei 30 anos vendo o preço que famílias pagam quando não entendem o que estão repetindo.</p>
+
+      <p style="color:var(--color-text); font-weight:700; font-size:18px;">
+        R$19 e 7 dias de garantia. O risco é praticamente zero.
+      </p>
+    </div>
+
+    <div class="btn-wrap mt-xl">
+      <a href="#" class="btn btn--gold" style="font-size:18px; padding: 22px 0 20px;">
+        QUERO COMEÇAR AGORA
+      </a>
+      <p class="btn-cap mt-md">Acesso imediato · Garantia de 7 dias</p>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
